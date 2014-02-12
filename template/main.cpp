@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <vector>
 #include <deque>
+#include <queue>
 #include <map>
 
 #include <iostream>
