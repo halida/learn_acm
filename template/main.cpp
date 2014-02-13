@@ -18,13 +18,16 @@ using namespace std;
 
 const int INF = 1 << 29;
 
-
 void solve(){
 
 };
 
+void scan(){
+}
+
 int main(int argc, char *argv[])
 {
+    scan();
     solve();
     return 0;
 }
