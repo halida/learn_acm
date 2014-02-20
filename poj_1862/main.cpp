@@ -2,7 +2,7 @@
 //----------------------------------------------------------
 // module: main
 // url: http://poj.org/problem?id=1862
-// time spend: 09:10 - 09:29
+// time spend: 09:10 - 09:29 = 0:19
 //
 // lg f(a, b) = lg2 + 1/2*lg(a) + 1/2*lg(b)
 // lg f(c, d) = lg2 + 1/2*lg(a) + 1/2* ( lg2 + 1/2*lg(a) + 1/2*lg(b) )
