@@ -2,7 +2,8 @@
 //----------------------------------------------------------
 // module: main
 // url: http://poj.org/problem?id=2385
-// time spend: 15:03-15:30
+// time spend: 15:03-15:30 11:15-11:27 = 0:39
+// 动态规划，少处理了一个边界条件浪费了12分钟
 //----------------------------------------------------------
 #include <algorithm>
 #include <vector>
@@ -36,7 +37,9 @@ void solve(){
                 {
                     for (int j = 0; j < 2; ++j)
                         {
-                            dp[j][k] = max(dp[j][k], dp[(j+1)%2][k+1]);
+                            if (k!=W) {
+                                dp[j][k] = max(dp[j][k], dp[(j+1)%2][k+1]);
+                            }
                             dp[j][k] += (a[i] == (j+1) ? 1 : 0);
                             // printf("%d,", dp[j][k]);
                         }
@@ -44,7 +47,7 @@ void solve(){
                 }
             // printf("\n");
         }
-    printf("%d\n", max(dp[0][0], dp[1][0]));
+    printf("%d\n", max(*max_element(dp[0], dp[0]+W), *max_element(dp[1], dp[1]+W)));
 };
 
 void scan(){
