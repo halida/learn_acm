@@ -1,0 +1,2 @@
+run:
+	c++ main.cpp
