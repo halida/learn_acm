@@ -2,7 +2,7 @@
 //----------------------------------------------------------
 // module: main
 // url: http://poj.org/problem?id=1001
-// time spend: 15:10-
+// time spend: 07:46-09.17 = 1:31
 //----------------------------------------------------------
 #include <algorithm>
 #include <vector>
@@ -19,106 +19,142 @@ using namespace std;
 
 const int INF = 1 << 29;
 
+typedef long long LL;
+
 char s[10];
 int n;
-int sv;
-int dot;
+
+const int c = 5;
+const int mul = 100000;
+
+int exp(int v){
+    int r = 1;
+    for (int i = 0; i < v; ++i)
+        {
+            r *= 10;
+        }
+    return r;
+}
+
+int getl(LL v){
+    if (v == 0) return 0;
+    char buffer[10];
+    int n = sprintf(buffer, "%lld", v);
+    return n;
+};
+
+void ppp(int v, int l, int t){
+    printf("ppp: %d, %d, %d\n", v, l, t);
+
+    int vl = getl(v);
+    int d = exp(vl) / 10;
+
+    for (int i = 0; i < l; ++i)
+        {
+            if (t == i) printf(".");
+            int m = v / d;
+            v -= m * d;
+            d /= 10;
+            printf("%d", m);
+        }
+}
 
 void solve(){
-    // locate dot
-    sv = 0;
-    dot = 0;
-    int sl = strlen(s);
-    for (int i = 0; i < sl; ++i)
+    printf("val: '%s' ** %d\n", s, n);
+
+    // scan value to int and p
+    LL v = 0;
+    int p = 0;
+    for (int i = 0; i < strlen(s); ++i)
         {
-            if (s[i] == '.')
-                {
-                    dot = (sl-i-1);
-                }
-            else
-                {
-                    sv *= 10;
-                    sv += s[i] - '0';
-                }
-        }
-    // printf("%d, %d, %d \n", dot, sv, n);
-
-    // caculate
-    vector<long long> result;
-    result.push_back(1);
-
-    const int OO = 100000;
-
-    for (int i = 0; i < n; ++i)
-        {
-            int rrs = result.size();
-            for (int j = 0; j < rrs; j++)
-                {
-                    result[j] *= sv;
-                }
-
-            long long overflow = 0;
-            for (int j = 0; j < rrs; ++j)
-                {
-                    overflow = result[j] / OO;
-                    result[j] %= OO;
-                    if (j < rrs-1) {
-                        result[j+1] += overflow;
-                    }
-                }
-            if (overflow > 0){
-                result.push_back(overflow);
+            if (s[i] == '.') {
+                p = strlen(s) - 1 - i;
+            } else {
+                v *= 10;
+                v += int(s[i] - '0');
             }
         }
-    // int rsf = result.size();
-    // for (int i = 0; i < rsf; ++i)
-    //     {
-    //         printf("%lld ", result[rsf - i - 1]);
-    //     }
-    // printf("\n");
+    cout << "spl: " << v << ", " << p << endl;
 
-    deque<int> ls;
-    int rs = result.size();
-    for (int i = 0; i < rs; ++i)
+    // multiply
+    vector <LL> mv;
+    mv.push_back(v);
+
+    // multi first
+    for (int i = 0; i < n-1; ++i)
         {
-            int v = result[i];
-            // printf("%d\n", v);
-            for (int j = 0; j < 5; ++j)
+            int len = mv.size();
+            // mul
+            for (int j = 0; j < len; ++j)
                 {
-                    ls.push_back(v % 10);
-                    v /= 10;
+                    mv[j] *= v;
+                }
+            // mod
+            for (int j = 0; j < len; ++j)
+                {
+                    LL mod = mv[j] / mul;
+                    if (mod <= 0) continue;
+
+                    if (j >= mv.size()-1) {
+                        mv.push_back(mod);
+                    } else {
+                        mv[j+1] += mod;
+                    }
+                    mv[j] %= mul;
                 }
         }
-    while(ls.back() == 0) ls.pop_back();
-    // for (int i = 0; i < ls.size(); ++i) printf("%d", ls[i]);
-    // printf("\n");
-    // return;
+    if (n == 0) mv[0] = 0;
 
-    int level = n * dot;
-    const int DOT = 22;
-    if (level != 0) {
-        if (level > ls.size()) {
-            for (int i = 0; i < (level - ls.size()); ++i) ls.push_back(0);
-            ls.push_back(DOT);
-            ls.push_back(0);
-        } else {
-            ls.insert(ls.begin()+level, DOT);
+    cout << "mul: ";
+    for (int i = 0; i < mv.size(); ++i)
+        {
+            printf("%lld, ", mv[i]);
         }
-        while(ls.front() == 0) ls.pop_front();
+    printf("\n");
+
+    int mp = p*n;
+    int mm = mv.size() * c - c + getl(mv[mv.size()-1]);
+    int pf = mm - mp;
+    printf("pts: %d, %d\n", mp, mm);
+
+    // when p*n > lm, puts zeros
+    if (mp >= mm) {
+        printf("0.");
+        for (int i = 0; i < (mp-mm); ++i)
+            {
+                printf("0");
+            }
     }
 
-    // for (int i = 0; i < ls.size(); ++i) printf("%d", ls[i]);
-    // printf("\n");
-    // return;
-
-    for (int i = ls.size()-1; i >= 0 ; --i)
+    // puts results and p accordinary
+    int t = pf;
+    for (int i = mv.size()-1; i >=0; --i)
         {
-            if (ls[i] == DOT) {
-                printf(".");
+            int v = mv[i];
+            int l = c;
+            char s[10];
+            if (i==mv.size()-1){
+                sprintf(s, "%d", v);
             } else {
-                printf("%d", ls[i]);
+                sprintf(s, "%05d", v);
             }
+            // add t
+            if (0<t && t<strlen(s))
+                {
+                    char tmp = '.';
+                    for (int i = t; i <= strlen(s); ++i)
+                        {
+                            tmp = s[i];
+                            s[i] = tmp;
+                        }
+                }
+            // remove end 0
+            // todo
+            printf("%s", s);
+            t -= l;
         }
+    printf("\n");
+
     printf("\n");
 }
 
