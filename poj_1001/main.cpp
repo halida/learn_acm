@@ -2,7 +2,7 @@
 //----------------------------------------------------------
 // module: main
 // url: http://poj.org/problem?id=1001
-// time spend: 07:46-09.17 = 1:31
+// time spend: 07:46-09.17 = 1:31 7:56-9:35 = 1:39
 //----------------------------------------------------------
 #include <algorithm>
 #include <vector>
@@ -17,53 +17,27 @@
 
 using namespace std;
 
-const int INF = 1 << 29;
-
-typedef long long LL;
+typedef long LL;
 
 char s[10];
-int n;
+int n = 0;
 
-const int c = 5;
-const int mul = 100000;
+const int c = 1;
+const int mul = 10;
 
-int exp(int v){
-    int r = 1;
-    for (int i = 0; i < v; ++i)
+void show(vector<LL> mv){
+    cout << "mul: ";
+    for (int i = 0; i < mv.size(); ++i)
         {
-            r *= 10;
+            printf("%ld, ", mv[i]);
         }
-    return r;
-}
-
-int getl(LL v){
-    if (v == 0) return 0;
-    char buffer[10];
-    int n = sprintf(buffer, "%lld", v);
-    return n;
-};
-
-void ppp(int v, int l, int t){
-    printf("ppp: %d, %d, %d\n", v, l, t);
-
-    int vl = getl(v);
-    int d = exp(vl) / 10;
-
-    for (int i = 0; i < l; ++i)
-        {
-            if (t == i) printf(".");
-            int m = v / d;
-            v -= m * d;
-            d /= 10;
-            printf("%d", m);
-        }
+    printf("\n");
 }
 
 void solve(){
-    printf("val: '%s' ** %d\n", s, n);
-
+    // printf("val: '%s' ** %d\n", s, n);
     // scan value to int and p
-    LL v = 0;
+    int v = 0;
     int p = 0;
     for (int i = 0; i < strlen(s); ++i)
         {
@@ -74,87 +48,85 @@ void solve(){
                 v += int(s[i] - '0');
             }
         }
-    cout << "spl: " << v << ", " << p << endl;
+    // remove 0's
+    while((v % 10 == 0) && (p > 0)){
+        v /= 10;
+        p --;
+    }
+    // cout << "spl: " << v << ", " << p << endl;
 
     // multiply
     vector <LL> mv;
     mv.push_back(v);
 
+    if (n == 0) {
+        mv[0] = 1;
+    } else {
+    }
+
     // multi first
-    for (int i = 0; i < n-1; ++i)
+    for (int i = 0; i < n; ++i)
         {
             int len = mv.size();
+
             // mul
+            if (i < n-1) {
             for (int j = 0; j < len; ++j)
                 {
                     mv[j] *= v;
                 }
+            }
+
             // mod
-            for (int j = 0; j < len; ++j)
-                {
-                    LL mod = mv[j] / mul;
-                    if (mod <= 0) continue;
+            int j = 0;
+            while(j < mv.size()) {
+                // printf("%d, %d\n", j, mv.size());
+                int mod = mv[j] / mul;
+                if (mod <= 0) {j++; continue;};
 
-                    if (j >= mv.size()-1) {
-                        mv.push_back(mod);
-                    } else {
-                        mv[j+1] += mod;
-                    }
-                    mv[j] %= mul;
+                if (j >= mv.size()-1) {
+                    // at last
+                    mv.push_back(mod);
+                } else {
+                    mv[j+1] += mod;
                 }
+                mv[j] %= mul;
+                j++;
+            };
         }
-    if (n == 0) mv[0] = 0;
 
-    cout << "mul: ";
-    for (int i = 0; i < mv.size(); ++i)
-        {
-            printf("%lld, ", mv[i]);
-        }
-    printf("\n");
+    // show(mv);
 
     int mp = p*n;
-    int mm = mv.size() * c - c + getl(mv[mv.size()-1]);
+    int mm = mv.size();
     int pf = mm - mp;
-    printf("pts: %d, %d\n", mp, mm);
+    // printf("mp: %d, mm: %d, pf: %d\n", mp, mm, pf);
 
-    // when p*n > lm, puts zeros
-    if (mp >= mm) {
-        printf("0.");
+    // add pf
+    if (mp > 0) {
+    if (mp < mm){
+        std::vector<LL>::iterator it;
+        it = mv.begin();
+        it += mp;
+        mv.insert(it, -1); // -1 as pts
+    } else {
         for (int i = 0; i < (mp-mm); ++i)
             {
-                printf("0");
+                mv.push_back(0);
             }
+        mv.push_back(-1);
+    }
     }
 
-    // puts results and p accordinary
-    int t = pf;
-    for (int i = mv.size()-1; i >=0; --i)
+    // show result
+    for (int i = mv.size()-1; i >= 0; --i)
         {
-            int v = mv[i];
-            int l = c;
-            char s[10];
-            if (i==mv.size()-1){
-                sprintf(s, "%d", v);
+            if (mv[i] == -1){
+                printf(".");
             } else {
-                sprintf(s, "%05d", v);
+                printf("%ld", mv[i]);
             }
-            // add t
-            if (0<t && t<strlen(s))
-                {
-                    char tmp = '.';
-                    for (int i = t; i <= strlen(s); ++i)
-                        {
-                            tmp = s[i];
-                            s[i] = tmp;
-                        }
-                }
-            // remove end 0
-            // todo
-            printf("%s", s);
-            t -= l;
         }
-    printf("\n");
-
     printf("\n");
 }
 
